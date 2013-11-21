@@ -2,6 +2,7 @@ from urllib.request import urlopen
 import pifacecad.tools
 import pifacecad
 from time import sleep
+import sys
 from pifacecad.tools.question import LCDQuestion
 
 cad = pifacecad.PiFaceCAD()
@@ -81,16 +82,10 @@ if not answer:
 		cad.lcd.write(format(result, '.2f'))
 		print(format(result,'.2f'))
 		while cad.switches[0].value !=  1:
+			if cad.switches[4].value:
+				break
 			sleep(.2)
 		cad.lcd.clear()
-
-
-
-
-
-
-
-
 
 
 else:
@@ -126,7 +121,15 @@ else:
 		html = str(response.read())
 
 
-		html = html.split("= <span class=bld>")[1]
+		try:
+			html = html.split("= <span class=bld>")[1]
+		except IndexError:
+			print("For some reason, Google finance converter does not convert between those currencies")
+			cad.lcd.clear()
+			cad.lcd.write("Google cant conv\nthose currencies")
+			sleep(2)
+			sys.exit()
+
 		result = float(html.split(" " +toCurrency)[0])
 		cad.lcd.set_cursor(0,0)
 
@@ -136,6 +139,8 @@ else:
 		print(format(result,'.2f'))
 		written = False
 		while cad.switches[0].value !=  1:
+			if cad.switches[4].value:
+				break
 			sleep(.2)
 			if cad.switches[1].value == 1 and not written:
 				written = True
@@ -150,5 +155,8 @@ else:
 				if currentPair not in pairs:	
 					f = open('currencyPairs','a')
 					f.write(fromCurrency + " " + toCurrency + "\n")
+					cad.lcd.set_cursor(0,1)
+					print("Pair saved")
+					cad.lcd.write("Pair saved")
 
 		cad.lcd.clear()

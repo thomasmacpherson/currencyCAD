@@ -1,8 +1,12 @@
+import sys
+if sys.version[0] != '3':
+	print ('You must run currencyCAD with python3')
+	sys.exit(0)
+
 from urllib.request import urlopen
 import pifacecad.tools
 import pifacecad
 from time import sleep
-import sys
 from pifacecad.tools.question import LCDQuestion
 
 cad = pifacecad.PiFaceCAD()
